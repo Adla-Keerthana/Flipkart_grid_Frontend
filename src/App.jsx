@@ -1,20 +1,31 @@
-import React from 'react';
-import Home from './components/Home'; // Import the Home component
+// src/App.js
+import React from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import LabelExtraction from "./components/Label_Extraction.jsx";
+import ExpiryExtraction from "./components/Expiry_Extraction.jsx";
+import FreshnessPrediction from "./components/Freshness_Prediction.jsx";
+import BrandRecognition from "./components/Brand_Recognition.jsx";
+import Home from "./components/Home.jsx";
+import Navbar from "./components/Navbar.jsx";
 
-function App() {
+const App = () => {
   return (
-    <div className="bg-gray-900 min-h-screen flex items-center justify-center">
-      <div className="container mx-auto p-6 bg-gray-800 shadow-lg rounded-lg">
-        <h1 className="text-4xl font-extrabold text-center text-neon-blue mb-6">
-          Flipkart Grid 6.0 Robotics Interface
-        </h1>
-        <p className="text-center text-gray-400 mb-10">
-          A robotics-driven solution for extracting and processing product data
-        </p>
-        <Home />
+    <Router>
+      <div>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/label-extraction" element={<LabelExtraction />} />
+          <Route path="/expiry-extraction" element={<ExpiryExtraction />} />
+          <Route
+            path="/freshness-prediction"
+            element={<FreshnessPrediction />}
+          />
+          <Route path="/brand-recognition" element={<BrandRecognition />} />
+        </Routes>
       </div>
-    </div>
+    </Router>
   );
-}
+};
 
 export default App;
