@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .text-neon-yellow {
+    color: #f2ff49;
+  }
+  .bg-neon-blue {
+    background-color: #18a2e7;
+  }
+  .bg-neon-blue-dark {
+    background-color: #1379b1;
+  }
+  .bg-neon-green {
+    background-color: #00ff00;
+  }
+  .bg-neon-green-dark {
+    background-color: #00cc00;
+  }
+  .file:bg-neon-yellow {
+    background-color: #f2ff49;
+  }
+}
