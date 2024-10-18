@@ -4,6 +4,7 @@ const LabelExtraction = () => {
   const [imageFiles, setImageFiles] = useState({ label: null });
   const [capturedImages, setCapturedImages] = useState({ label: null });
   const [showCameraOverlay, setShowCameraOverlay] = useState(false);
+  const [serverResponse, setServerResponse] = useState(null); // New state for response
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
 
@@ -70,20 +71,47 @@ const LabelExtraction = () => {
     try {
       const response = await fetch("http://127.0.0.1:8000/label-extraction", {
         method: "POST",
-        body: formData,
+        body: formData,  // Correctly passing formData here
       });
 
       if (!response.ok) {
         const errorDetail = await response.json();
         console.error("Server error:", errorDetail);
+        setServerResponse(errorDetail.detail || "An error occurred");
         return; // Handle error as needed
       }
 
       const result = await response.json();
-      console.log(result); // Handle result as needed
+      setServerResponse(result); // Store the response directly
     } catch (error) {
       console.error("Network error:", error);
+      setServerResponse("Network error occurred. Please try again later.");
     }
+  };
+
+  // Helper function to filter and format the server response
+  const displayLabels = () => {
+    if (!serverResponse || !serverResponse.labels) return null;
+
+    const { labels } = serverResponse;
+
+    // Extract all non-null values
+    const extractedLabels = Object.entries(labels)
+      .filter(([key, value]) => value !== null && value !== undefined) // Filter out null values
+      .map(([key, value]) => (Array.isArray(value) ? value.join(", ") : value)); // Flatten arrays if any
+
+    return (
+      <div className="grid grid-cols-2 gap-4 mt-6 p-4 bg-gray-100 text-gray-800 rounded-lg">
+        {extractedLabels.map((value, index) => (
+          <div
+            key={index}
+            className="bg-white text-center p-3 rounded shadow-sm text-sm"
+          >
+            {value}
+          </div>
+        ))}
+      </div>
+    );
   };
 
   return (
@@ -159,6 +187,9 @@ const LabelExtraction = () => {
           Upload
         </button>
       </form>
+
+      {/* Display extracted labels */}
+      {serverResponse && displayLabels()}
     </div>
   );
 };

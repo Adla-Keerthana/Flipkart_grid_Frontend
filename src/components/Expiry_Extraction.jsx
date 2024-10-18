@@ -4,6 +4,7 @@ const ExpiryRecognition = () => {
   const [imageFiles, setImageFiles] = useState({ expiry: null });
   const [capturedImages, setCapturedImages] = useState({ expiry: null });
   const [showCameraOverlay, setShowCameraOverlay] = useState(false);
+  const [serverResponse, setServerResponse] = useState(""); // Add this line
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
 
@@ -46,25 +47,47 @@ const ExpiryRecognition = () => {
   };
 
   // Upload image and send to server
-  const uploadImage = async () => {
+  const uploadImage = async (e) => {
+    e.preventDefault();
     const formData = new FormData();
-    const fileInput = document.querySelector('input[type="file"]');
-    if (fileInput.files[0]) {
-      formData.append("file", fileInput.files[0]);
-    }
-    if (capturedImages.expiry) {
-      const response = await fetch(capturedImages.expiry);
-      const blob = await response.blob();
-      formData.append("file", blob, "captured-image.png");
+
+    // Check if the captured image is available or a file is uploaded
+    const imageToUpload = capturedImages.expiry || imageFiles.expiry;
+    if (imageToUpload) {
+      if (capturedImages.expiry) {
+        // If the captured image is from canvas, convert dataURL to Blob
+        const response = await fetch(capturedImages.expiry);
+        const blob = await response.blob();
+        formData.append("file", blob, "capturedImage.png");
+      } else {
+        // If it's a file upload
+        const file = await fetch(imageFiles.expiry).then((res) => res.blob());
+        formData.append("file", file, "uploadedImage.png");
+      }
+    } else {
+      console.error("No image file to upload");
+      return;
     }
 
-    const res = await fetch("http://127.0.0.1:8000/expiry-extraction", {
-      method: "POST",
-      body: formData,
-    });
+    try {
+      const response = await fetch("http://127.0.0.1:8000/expiry-extraction", {
+        method: "POST",
+        body: formData,
+      });
 
-    const data = await res.json();
-    console.log(data); // Process response from server
+      if (!response.ok) {
+        const errorDetail = await response.json();
+        console.error("Server error:", errorDetail);
+        setServerResponse(errorDetail.detail || "An error occurred");
+        return;
+      }
+
+      const result = await response.json();
+      setServerResponse(result);
+    } catch (error) {
+      console.error("Network error:", error);
+      setServerResponse("Network error occurred. Please try again later.");
+    }
   };
 
   return (
@@ -140,6 +163,28 @@ const ExpiryRecognition = () => {
           Upload
         </button>
       </form>
+
+    {serverResponse && (
+  <div className="mt-4">
+    <h3 className="text-xl font-semibold">Server Response:</h3>
+    <p><strong>Highest Date:</strong> {serverResponse.highest_date}</p>
+    <p><strong>Raw Text:</strong> {serverResponse.raw_text}</p>
+    <div>
+      <strong>Extracted Dates:</strong>
+      {Array.isArray(serverResponse.extracted_dates) ? (
+        <ul>
+          {serverResponse.extracted_dates.map((date, index) => (
+            <li key={index}>{date}</li>
+          ))}
+        </ul>
+      ) : (
+        serverResponse.extracted_dates
+      )}
+    </div>
+  </div>
+)}
+
+
     </div>
   );
 };

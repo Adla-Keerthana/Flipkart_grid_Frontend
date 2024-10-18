@@ -4,6 +4,8 @@ const FreshnessExtraction = () => {
   const [imageFiles, setImageFiles] = useState({ freshness: null });
   const [capturedImages, setCapturedImages] = useState({ freshness: null });
   const [showCameraOverlay, setShowCameraOverlay] = useState(false);
+  const [freshnessPrediction, setFreshnessPrediction] = useState(false);
+  const [PredictedValue, setPredictedValue] = useState(null);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
 
@@ -45,7 +47,7 @@ const FreshnessExtraction = () => {
     setShowCameraOverlay(false);
   };
 
-  // Upload image and send to server
+  // Upload image and send to server, then handle response
   const uploadImage = async () => {
     const formData = new FormData();
     const fileInput = document.querySelector('input[type="file"]');
@@ -58,13 +60,19 @@ const FreshnessExtraction = () => {
       formData.append("file", blob, "captured-image.png");
     }
 
-    const res = await fetch("YOUR_SERVER_URL/freshness-extraction", {
-      method: "POST",
-      body: formData,
-    });
+    try {
+      const res = await fetch("http://127.0.0.1:8000/freshness-prediction", {
+        method: "POST",
+        body: formData,
+      });
 
-    const data = await res.json();
-    console.log(data); // Process response from server
+      const data = await res.json();
+      console.log(data);
+      setFreshnessPrediction(true); 
+      setPredictedValue(data["predicted_shelf_life"]) // Assuming server response has 'freshness_score'
+    } catch (error) {
+      console.error("Error uploading image", error);
+    }
   };
 
   return (
@@ -140,6 +148,16 @@ const FreshnessExtraction = () => {
           Upload
         </button>
       </form>
+
+      {freshnessPrediction && (
+        <div className="mt-4 p-4 bg-gray-100 rounded-lg">
+          <h3 className="text-xl font-semibold">Freshness Prediction</h3>
+          <p className="text-lg mt-2">
+            The predicted freshness score is:{" "}
+            <span className="font-bold">{PredictedValue}</span>
+          </p>
+        </div>
+      )}
     </div>
   );
 };
