@@ -58,7 +58,7 @@ const BrandRecognition = () => {
       formData.append("file", blob, "captured-image.png");
     }
 
-    const res = await fetch("YOUR_SERVER_URL/brand-recognition", {
+    const res = await fetch("/brand-recognition", {
       method: "POST",
       body: formData,
     });

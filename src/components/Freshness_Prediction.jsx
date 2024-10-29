@@ -46,18 +46,54 @@ const FreshnessExtraction = () => {
 
     setShowCameraOverlay(false);
   };
+  const resizeImage = (imageFile, maxWidth, maxHeight) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.src = URL.createObjectURL(imageFile);
 
-  // Upload image and send to server, then handle response
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+
+        // Calculate the new width and height based on the aspect ratio
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxWidth || height > maxHeight) {
+          if (width > height) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          } else {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+
+        // Draw the resized image to the canvas
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Convert canvas back to blob
+        canvas.toBlob((blob) => {
+          resolve(blob); // Return resized image as blob
+        }, "image/jpeg");
+      };
+
+      img.onerror = (error) => reject(error);
+    });
+  };
+
+  // Uploading the resized image
   const uploadImage = async () => {
     const formData = new FormData();
     const fileInput = document.querySelector('input[type="file"]');
+
     if (fileInput.files[0]) {
-      formData.append("file", fileInput.files[0]);
-    }
-    if (capturedImages.freshness) {
-      const response = await fetch(capturedImages.freshness);
-      const blob = await response.blob();
-      formData.append("file", blob, "captured-image.png");
+      // Resize image before sending
+      const resizedImage = await resizeImage(fileInput.files[0], 224, 224);
+      formData.append("file", resizedImage, "resized-image.jpg");
     }
 
     try {
@@ -65,11 +101,11 @@ const FreshnessExtraction = () => {
         method: "POST",
         body: formData,
       });
-
       const data = await res.json();
       console.log(data);
-      setFreshnessPrediction(true); 
-      setPredictedValue(data["predicted_shelf_life"]) // Assuming server response has 'freshness_score'
+
+      setFreshnessPrediction(true);
+      setPredictedValue(data["predicted_shelf_life"]);
     } catch (error) {
       console.error("Error uploading image", error);
     }

@@ -64,105 +64,75 @@ const Home = () => {
   };
 
   return (
-    <>
-      <div className="relative p-7">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Module UI */}
-          {["expiry", "label", "shelfLife", "brand"].map((module) => (
-            <div
-              key={module}
-              className="p-6 bg-gray-800 border border-gray-600 rounded-lg shadow-lg text-center"
-            >
-              <h2 className="text-2xl font-bold text-neon-yellow mb-4 capitalize">
-                {module.replace(/([A-Z])/g, " $1")} Module
-              </h2>
-              <p className="text-gray-300 mb-4">
-                Use either the camera or file upload to provide images.
-              </p>
+    <div
+      className="flex flex-col items-center min-h-screen justify-center py-12 bg-cover bg-center relative"
+      style={{
+        backgroundImage: `url('https://t4.ftcdn.net/jpg/06/57/20/69/360_F_657206985_7JnPZxrSIP9L6Pk3dyf9i8ljFEpv8iqZ.jpg')`,
+      }} // Update the path to your image
+    >
+      <div className="absolute inset-0 opacity-50"></div>{" "}
+      {/* Overlay for better text readability */}
+      <div className="relative z-10 text-white">
+        <h2 className="text-5xl text-black text-center font-bold mb-8 drop-shadow-md">
+          Flipkart Grid 6.0
+        </h2>
+        <p className="text-center text-black text-xl mb-12 max-w-6xl">
+          As part of the Flipkart Grid 6.0 challenge, we are building an
+          efficient system for recognizing product labels, predicting expiry
+          dates, estimating freshness, and identifying brands from grocery
+          product images. Our goal is to enhance efficiency in Smart Vision
+          Technology Quality Control by Using Advanced imaging Systems and
+          Algorithms to Capture and Analyze visual information.
+        </p>
 
-              {/* Image Upload */}
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(event) => handleFileChange(event, module)}
-                className="mb-4 file:bg-neon-yellow file:text-black text-white"
-              />
-
-              {/* Display uploaded or captured image */}
-              {imageFiles[module] && (
-                <img
-                  src={imageFiles[module]}
-                  alt={`${module} preview`}
-                  className="mb-4 w-full"
-                />
-              )}
-              {capturedImages[module] && (
-                <img
-                  src={capturedImages[module]}
-                  alt={`${module} capture`}
-                  className="mb-4 w-full"
-                />
-              )}
-
-              {/* Capture buttons */}
-              <button
-                onClick={() => handleCapture(module)}
-                className="bg-neon-blue text-white px-4 py-2 rounded hover:bg-neon-blue-dark"
-              >
-                Capture from Camera
-              </button>
-            </div>
-          ))}
-        </div>
-
-        {/* Camera Overlay */}
-        {showCameraOverlay && (
-          <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
-            <div className="relative p-8 bg-gray-900 rounded-lg">
-              <h3 className="text-white text-xl mb-4 text-center capitalize">
-                {activeModule} Module - Camera View
-              </h3>
-
-              {/* Video Stream for Camera Capture */}
-              <video
-                ref={videoRef}
-                className="w-full mb-4 border border-neon-blue rounded-lg"
-                autoPlay
-                playsInline
-              />
-
-              <canvas
-                ref={canvasRef}
-                style={{ display: "none" }}
-                width="640"
-                height="480"
-              ></canvas>
-
-              {/* Snapshot button */}
-              <button
-                onClick={takeSnapshot}
-                className="bg-neon-green text-white px-4 py-2 rounded hover:bg-neon-green-dark"
-              >
-                Take Snapshot
-              </button>
-
-              {/* Close overlay button */}
-              <button
-                onClick={() => {
-                  const stream = videoRef.current.srcObject;
-                  const tracks = stream.getTracks();
-                  tracks.forEach((track) => track.stop());
-                  setShowCameraOverlay(false);
-                }}
-                className="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 rounded"
-              >
-                Close
-              </button>
-            </div>
+        {/* Cards Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 w-full max-w-6xl px-4">
+          {/* Label Extraction Card */}
+          <div className="bg-white p-8 shadow-lg rounded-lg text-center transition duration-300 transform hover:scale-105 hover:shadow-2xl">
+            <h3 className="text-2xl font-bold mb-4 text-black">
+              Label Extraction
+            </h3>
+            <p className="text-gray-600">
+              Automatically identify and extract product labels from images,
+              making inventory management faster and more accurate.
+            </p>
           </div>
-        )}
+
+          {/* Expiry Extraction Card */}
+          <div className="bg-white p-8 shadow-lg rounded-lg text-center transition duration-300 transform hover:scale-105 hover:shadow-2xl">
+            <h3 className="text-2xl font-bold mb-4 text-black">
+              Expiry Extraction
+            </h3>
+            <p className="text-gray-600">
+              Detect and extract expiry information from product labels to
+              ensure freshness and reduce waste.
+            </p>
+          </div>
+
+          {/* Freshness Prediction Card */}
+          <div className="bg-white p-8 shadow-lg rounded-lg text-center transition duration-300 transform hover:scale-105 hover:shadow-2xl">
+            <h3 className="text-2xl font-bold mb-4 text-black">
+              Freshness Prediction
+            </h3>
+            <p className="text-gray-600">
+              Predict the freshness and shelf life of fruits and vegetables,
+              helping you make informed decisions about product quality.
+            </p>
+          </div>
+
+          {/* Brand Recognition Card */}
+          <div className="bg-white p-8 shadow-lg rounded-lg text-center transition duration-300 transform hover:scale-105 hover:shadow-2xl">
+            <h3 className="text-2xl font-bold mb-4 text-black">
+              Brand Recognition
+            </h3>
+            <p className="text-gray-600">
+              Identify and recognize brands from product images to support
+              better inventory management and product tracking.
+            </p>
+          </div>
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 

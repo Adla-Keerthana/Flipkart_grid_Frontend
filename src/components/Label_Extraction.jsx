@@ -71,7 +71,7 @@ const LabelExtraction = () => {
     try {
       const response = await fetch("http://127.0.0.1:8000/label-extraction", {
         method: "POST",
-        body: formData,  // Correctly passing formData here
+        body: formData, // Correctly passing formData here
       });
 
       if (!response.ok) {
@@ -96,9 +96,9 @@ const LabelExtraction = () => {
     const { labels } = serverResponse;
 
     // Extract all non-null values
-    const extractedLabels = Object.entries(labels)
-      .filter(([key, value]) => value !== null && value !== undefined) // Filter out null values
-      .map(([key, value]) => (Array.isArray(value) ? value.join(", ") : value)); // Flatten arrays if any
+    const extractedLabels = Object.values(labels)
+      .filter((value) => value !== null && value !== undefined) // Filter out null values
+      .flatMap((value) => (Array.isArray(value) ? value : [value])); // Flatten arrays and non-arrays into a single array
 
     return (
       <div className="grid grid-cols-2 gap-4 mt-6 p-4 bg-gray-100 text-gray-800 rounded-lg">
